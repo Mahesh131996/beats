@@ -22,7 +22,11 @@ import (
 	"sync"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/pkg/errors"
+=======
+	"github.com/elastic/elastic-agent-libs/monitoring"
+>>>>>>> 895505cffe (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -35,9 +39,22 @@ import (
 	"github.com/elastic/go-sysinfo"
 )
 
+const processorName = "add_host_metadata"
+const logName = "processor." + processorName
+
+var (
+	reg *monitoring.Registry
+)
+
 func init() {
-	processors.RegisterPlugin("add_host_metadata", New)
+	processors.RegisterPlugin(processorName, New)
 	jsprocessor.RegisterPlugin("AddHostMetadata", New)
+
+	reg = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
+}
+
+type metrics struct {
+	FQDNLookupFailed *monitoring.Int
 }
 
 type addHostMetadata struct {
@@ -49,11 +66,8 @@ type addHostMetadata struct {
 	geoData mapstr.M
 	config  Config
 	logger  *logp.Logger
+	metrics metrics
 }
-
-const (
-	processorName = "add_host_metadata"
-)
 
 // New constructs a new add_host_metadata processor.
 func New(cfg *config.C) (processors.Processor, error) {
@@ -65,7 +79,10 @@ func New(cfg *config.C) (processors.Processor, error) {
 	p := &addHostMetadata{
 		config: config,
 		data:   mapstr.NewPointer(nil),
-		logger: logp.NewLogger("add_host_metadata"),
+		logger: logp.NewLogger(logName),
+		metrics: metrics{
+			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
+		},
 	}
 	p.loadData()
 
@@ -125,7 +142,29 @@ func (p *addHostMetadata) loadData() error {
 		return err
 	}
 
+<<<<<<< HEAD
 	data := host.MapHostInfo(h.Info())
+=======
+	hostname := h.Info().Hostname
+	if features.FQDN() {
+		fqdn, err := h.FQDN()
+		if err != nil {
+			// FQDN lookup is "best effort". If it fails, we monitor the failure, fallback to
+			// the OS-reported hostname, and move on.
+			p.metrics.FQDNLookupFailed.Inc()
+			p.logger.Debugf(
+				"unable to lookup FQDN (failed attempt counter: %d): %s, using hostname = %s as FQDN",
+				p.metrics.FQDNLookupFailed.Get(),
+				err.Error(),
+				hostname,
+			)
+		} else {
+			hostname = fqdn
+		}
+	}
+
+	data := host.MapHostInfo(h.Info(), hostname)
+>>>>>>> 895505cffe (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()

@@ -535,7 +535,12 @@ func (b *Beat) registerMetrics() {
 	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 
 	// state.host
+<<<<<<< HEAD
 	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
+=======
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
+>>>>>>> 895505cffe (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -730,6 +735,22 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	logp.Info("Beat ID: %v", b.Info.ID)
+
+	// Try to get the host's FQDN and set it.
+	h, err := sysinfo.Host()
+	if err != nil {
+		return fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	fqdn, err := h.FQDN()
+	if err != nil {
+		// FQDN lookup is "best effort".  We log the error, fallback to
+		// the OS-reported hostname, and move on.
+		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		b.Info.FQDN = b.Info.Hostname
+	} else {
+		b.Info.FQDN = fqdn
+	}
 
 	// initialize config manager
 	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)

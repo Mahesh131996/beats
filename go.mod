@@ -79,7 +79,11 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.3.0
 	github.com/elastic/go-structform v0.0.10
+<<<<<<< HEAD
 	github.com/elastic/go-sysinfo v1.9.0
+=======
+	github.com/elastic/go-sysinfo v1.9.1-0.20230328042007-6dcfe88b8359
+>>>>>>> 895505cffe (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -193,12 +197,19 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.2.16
 	github.com/elastic/elastic-agent-shipper-client v0.4.0
 	github.com/elastic/elastic-agent-system-metrics v0.4.6
+=======
+	github.com/elastic/elastic-agent-libs v0.3.3
+	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
+	github.com/elastic/elastic-agent-system-metrics v0.5.1-0.20230328163318-a87a0b315c42
+>>>>>>> 895505cffe (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
+	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/google/cel-go v0.13.0
 	github.com/googleapis/gax-go/v2 v2.6.0
 	github.com/gorilla/handlers v1.5.1
